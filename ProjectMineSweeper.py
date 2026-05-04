@@ -29,13 +29,19 @@ class tracker():
                         count += 1
         return count
     
-    def win_condition(self):
-        for i in range(8):
-            for j in range(7):
-                if self.board[i][j] == 'safe ':
-                    return False
-        print("You win!")
-        return True
+    def win_condition(self, x, y):
+        if (x, y) == (7,6):
+            print("Final guess, is this a mine? (y/n)")
+            if input() == 'y' and self.board[7][6] == 'mine ':
+                print("You win!")
+                return True
+            elif input() == 'n' and self.board[7][6] == 'safe ':
+                print("You win!")
+                return True
+            else:   
+                print ("You lose!")
+                return False
+                    
 #Creating the tracker class that will be used to check if a spot is a mine and to count the number of surrounding mines
 
 board = [
@@ -53,11 +59,10 @@ user_board = [
     ['safe ', 'safe ', ' ',' ', ' ', ' ', ' '],
     [' ', ' ', ' ',' ', ' ', ' ', ' '],
     [' ', ' ', ' ',' ', ' ', ' ', ' '],
-    [ ' ', ' ', ' ',' ', ' ', ' ', ' '],
+    [' ', ' ', ' ',' ', ' ', ' ', ' '],
     [' ', ' ', ' ',' ', ' ', ' ', ' '],
     [' ', ' ', ' ',' ', ' ', ' ', ' '],
     [' ', ' ', ' ',' ', ' ', ' ', ' ']]
-
 
 safe_spots = [(0,0), (0,1), (1,0), (1,1)]
 
@@ -81,8 +86,8 @@ for k,j in startCoords:
         print(f"There are {mines_surround} mines surrounding this spot {k,j}.")
 
 while GameContinue:
-    x = int(input("Enter the x coordinate of the spot you want to check (0-7): "))
-    y = int(input("Enter the y coordinate of the spot you want to check (0-8): "))
+    x = int(input("Enter the x (row) coordinate of the spot you want to check (0-7): "))
+    y = int(input("Enter the y (column) coordinate of the spot you want to check (0-6): "))
     check_Mine = GameTracker.check_spot(x, y)
     if check_Mine == 1:
         GameContinue = False
@@ -92,13 +97,14 @@ while GameContinue:
     #checking if spot is a mine, if it is the game ends and shows the board, if not it continues
     
     mines_surround = GameTracker.surrounding_mines(x, y)
-    user_board[x][y] = str(mines_surround)
-    print(f"There are {mines_surround} mines surrounding this spot.")
+    print(f"There are {mines_surround} mines surrounding this spot ({x}, {y}).")
     for row in user_board:
         print(row)
+    #Giving the user feedback on how many mines are surrounding the spot they checked and showing the user board after each turn
     
-    if GameTracker.win_condition():
+    if GameTracker.win_condition(x, y):
         GameContinue = False
         for row in user_board and board:
             print(row)
         print("Congratulations on winning the game!")
+    #Checking if the user has won the game, if they have it ends and shows the user board and the actual board
