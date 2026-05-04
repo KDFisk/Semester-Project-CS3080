@@ -4,11 +4,13 @@
 
 from itertools import count
 import random
+minecount = 25
 
 class tracker():
     def __init__(self):
         self.board = board
         self.user_board = user_board
+        
         
     def check_spot(self, x, y):
         if self.board[x][y] == 'mine ':
@@ -29,20 +31,13 @@ class tracker():
                         count += 1
         return count
     
-    def win_condition(self, x, y):
-        if (x, y) == (7,6):
-            print("Final guess, is this a mine? (y/n)")
-            if input() == 'y' and self.board[7][6] == 'mine ':
-                print("You win!")
-                return True
-            elif input() == 'n' and self.board[7][6] == 'safe ':
-                print("You win!")
-                return True
-            else:   
-                print ("You lose!")
-                return False
-                    
-#Creating the tracker class that will be used to check if a spot is a mine and to count the number of surrounding mines
+    def win_condition(self, counter):
+        if counter == 0:
+            return True
+        else:
+            counter -= 1
+            return False
+        
 
 board = [
     [' ', ' ', ' ',' ', ' ', ' ', ' '],
@@ -53,7 +48,7 @@ board = [
     [' ', ' ', ' ',' ', ' ', ' ', ' '],
     [' ', ' ', ' ',' ', ' ', ' ', ' '],
     [' ', ' ', ' ',' ', ' ', ' ', ' ']]
-#7x8 board 
+#8x7 board 
 user_board = [
     ['safe ', 'safe ', ' ',' ', ' ', ' ', ' '],
     ['safe ', 'safe ', ' ',' ', ' ', ' ', ' '],
@@ -68,8 +63,11 @@ safe_spots = [(0,0), (0,1), (1,0), (1,1)]
 
 for i in range (8):
     for j in range(7):
-        if random.randint(0, 3) == 0:
+        randomint = random.randint(0, 2)
+        
+        if randomint == 0 and minecount > 0:
             board[i][j] = 'mine '
+            minecount -= 1
         else:
             board[i][j] = 'safe '
         if (i, j) in safe_spots:
@@ -88,6 +86,15 @@ for k,j in startCoords:
 while GameContinue:
     x = int(input("Enter the x (row) coordinate of the spot you want to check (0-7): "))
     y = int(input("Enter the y (column) coordinate of the spot you want to check (0-6): "))
+    
+    counter = 8*7 - minecount - 4
+    if GameTracker.win_condition(counter):
+        GameContinue = False
+        for row in user_board and board:
+            print(row)
+        print("Congratulations on winning the game!")
+    #Checking if the user has won the game, if they have it ends and shows the user board and the actual board
+    
     check_Mine = GameTracker.check_spot(x, y)
     if check_Mine == 1:
         GameContinue = False
@@ -102,9 +109,4 @@ while GameContinue:
         print(row)
     #Giving the user feedback on how many mines are surrounding the spot they checked and showing the user board after each turn
     
-    if GameTracker.win_condition(x, y):
-        GameContinue = False
-        for row in user_board and board:
-            print(row)
-        print("Congratulations on winning the game!")
-    #Checking if the user has won the game, if they have it ends and shows the user board and the actual board
+
