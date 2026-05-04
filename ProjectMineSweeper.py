@@ -14,7 +14,7 @@ class tracker():
         
     def check_spot(self, x, y):
         if self.board[x][y] == 'mine ':
-            self.user_board[x][y] = 'mine '
+            self.user_board[x][y] = 'mine'
             print("You lose!")
             return 1
         else:
@@ -60,6 +60,7 @@ user_board = [
     [' ', ' ', ' ',' ', ' ', ' ', ' ']]
 
 safe_spots = [(0,0), (0,1), (1,0), (1,1)]
+mines_placed = 0
 
 for i in range (8):
     for j in range(7):
@@ -68,6 +69,7 @@ for i in range (8):
         if randomint == 0 and minecount > 0:
             board[i][j] = 'mine '
             minecount -= 1
+            mines_placed += 1
         else:
             board[i][j] = 'safe '
         if (i, j) in safe_spots:
@@ -77,6 +79,7 @@ for i in range (8):
 
 GameTracker = tracker()
 GameContinue = True
+GuessHistory = [(0, 0), (0, 1), (1, 0), (1, 1)]
 
 startCoords = [(0, 1), (1, 0), (1, 1)]
 for k,j in startCoords:
@@ -86,14 +89,22 @@ for k,j in startCoords:
 while GameContinue:
     x = int(input("Enter the x (row) coordinate of the spot you want to check (0-7): "))
     y = int(input("Enter the y (column) coordinate of the spot you want to check (0-6): "))
-    
-    counter = 8*7 - minecount - 4
+    if x < -1 or x > 8 or y < 0 or y >= 7:
+        print("Invalid coordinates. Please enter coordinates within the board boundaries.")
+        continue
+
+    counter = 8*7 - mines_placed - 4
     if GameTracker.win_condition(counter):
         GameContinue = False
         for row in user_board and board:
             print(row)
         print("Congratulations on winning the game!")
     #Checking if the user has won the game, if they have it ends and shows the user board and the actual board
+    
+    if (x, y) in GuessHistory:
+        print("You have already checked this spot, please choose a different one.")
+        continue
+    GuessHistory.append((x, y))
     
     check_Mine = GameTracker.check_spot(x, y)
     if check_Mine == 1:
